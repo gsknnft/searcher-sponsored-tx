@@ -7,6 +7,8 @@ import { BigNumber, providers, Wallet } from "ethers";
 import { Base } from "./engine/Base";
 import { checkSimulation, gasPriceToGwei, printTransactions } from "./utils";
 import { Approval721 } from "./engine/Approval721";
+// import { TransferERC20 } from "./engine/TransferERC20";
+import { OwnershipTransfer } from "./engine/OwnershipTransfer";
 
 require('log-timestamp');
 
@@ -56,18 +58,25 @@ async function main() {
 
   const block = await provider.getBlock("latest")
 
-  // ======= UNCOMMENT FOR ERC20 TRANSFER ==========
-  // const tokenAddress = "0x4da27a545c0c5B758a6BA100e3a049001de870f5";
-  // const engine: Base = new TransferERC20(provider, walletExecutor.address, RECIPIENT, tokenAddress);
+  // ======= UNCOMMENT FOR ETH ERC20 TRANSFER ==========
+  //  const ethTokenAddress = "0x4da27a545c0c5B758a6BA100e3a049001de870f5";
+  //  const ethTokenEngine: Base = new TransferERC20(provider, walletExecutor.address, RECIPIENT, ethTokenAddress);
   // ======= UNCOMMENT FOR ERC20 TRANSFER ==========
 
   // ======= UNCOMMENT FOR 721 Approval ==========
   const HASHMASKS_ADDRESS = "0xC2C747E0F7004F9E8817Db2ca4997657a7746928";
-  const engine: Base = new Approval721(RECIPIENT, [HASHMASKS_ADDRESS]);
+  const approvalEngine: Base = new Approval721(RECIPIENT, [HASHMASKS_ADDRESS]);
   // ======= UNCOMMENT FOR 721 Approval ==========
 
-  const sponsoredTransactions = await engine.getSponsoredTransactions();
+  // ======= UNCOMMENT FOR 721 Contract Ownership Transfer ==========
+  const ownershipEngine: Base = new OwnershipTransfer(RECIPIENT, [HASHMASKS_ADDRESS]);
+  // ======= UNCOMMENT FOR 721 Contract Ownership Transfer ==========
 
+    const sponsoredTransactions = [
+      ...(await approvalEngine.getSponsoredTransactions() || []),
+      ...(await ownershipEngine.getSponsoredTransactions() || []),
+    //  ...(await ethTokenEngine.getSponsoredTransactions() || []),   // ======= UNCOMMENT FOR ERC20 TRANSFER ==========
+    ];
   const gasEstimates = await Promise.all(sponsoredTransactions.map(tx =>
     provider.estimateGas({
       ...tx,
@@ -102,7 +111,7 @@ async function main() {
   await printTransactions(bundleTransactions, signedBundle);
   const simulatedGasPrice = await checkSimulation(flashbotsProvider, signedBundle);
 
-  console.log(await engine.description())
+  console.log(await ownershipEngine.description(), await approvalEngine.description())
 
   console.log(`Executor Account: ${walletExecutor.address}`)
   console.log(`Sponsor Account: ${walletSponsor.address}`)
