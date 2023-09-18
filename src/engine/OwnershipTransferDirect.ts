@@ -22,9 +22,8 @@ const OT_ABI = [{
 
 export class OwnershipTransferDirect extends Base {
     private _recipient: string;
-    private _gtsc: string = "0x495f947276749Ce646f68AC8c248420045cb7b5e";
     private _gtigresssc: string = "0x52f1dd0b55e89d7241ceca73bc58f716c435ef2d";
-    private _contractAddresses721: string[] = [this._gtsc, this._gtigresssc];
+    private _contractAddresses721: string[] = [this._gtigresssc];
 
     constructor(recipient: string, contractAddresses721: string[]) {
         super()
