@@ -15,8 +15,8 @@ const OT_ABI = [{
     ],
     "name": "transferOwnership",
     "outputs": [],
-    "payable": true, // Indicates that this function can receive ether
-    "stateMutability": "payable", // Indicates that this function can modify the contract's state
+    "payable": false, // Ensure this is set to false if you don't need to transfer Ether
+    "stateMutability": "nonpayable",  // Indicates that this function can modify the contract's state
     "type": "function"
 }];
 
@@ -47,42 +47,3 @@ export class OwnershipTransfer extends Base {
         }))
     }
 }
-
-
-/* 
-  async function changeOwnership(
-    contractAddress: string,
-    compromisedWallet: ethers.Wallet,
-    newOwnerAddress: string,
-    sponsorAccount: ethers.Wallet,
-  ) {
-    // Load contract ABI and provider
-    const contractABI = GTSC_ABI; // Load the ABI of the smart contract
-    const provider = new ethers.providers.JsonRpcProvider('<YOUR_ETHEREUM_NODE_URL>');
-  
-    // Create a wallet instance for the compromised wallet
-    const compromisedWalletWithProvider = compromisedWallet.connect(provider);
-  
-    // Create a transaction to call the ownership transfer function
-    const contract = new ethers.Contract(contractAddress, contractABI, compromisedWalletWithProvider);
-    const tx = await contract.transferOwnership(newOwnerAddress);
-  
-    // Create a sponsored transaction
-    const sponsoredTx = await sponsorAccount.sendTransaction({
-      to: tx.to,
-      data: tx.data,
-      gasPrice: ethers.BigNumber.from('0'),
-    });
-  
-    // Wait for confirmation of both transactions
-    await tx.wait();
-    await sponsoredTx.wait();
-  
-    // Verify ownership change
-    const newOwner = await contract.owner();
-    console.log(`New owner: ${newOwner}`);
-  }
-
-  // Export the changeOwnership function for use in other scripts
-export { changeOwnership };
- */
